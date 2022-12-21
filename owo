@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+
+import typer
+import os
+import requests
+
+app = typer.Typer()
+
+@app.command()
+def ping():
+    try:
+        url = "http://" + str(os.environ['OWO_API_HOST']) + "/"     
+        response = requests.get(url)
+        print(response.content)
+    except KeyError:
+        print("API_HOST not set")
+
+@app.command()
+def merge(seq): 
+    try:
+        url = "http://" + str(os.environ['OWO_API_HOST']) + "/api/v1/sequence/merge"      
+        try:
+            response = requests.post(url,json={"name":seq})
+            print(response.content)
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            print("An error occurred performing request")
+            print(e)
+    except KeyError:
+        print("API_HOST not set")
+
+@app.command()
+def metrics(name,period):
+    try:
+        url = "http://" + str(os.environ['OWO_API_HOST']) + "/api/v1/metrics/get"    
+        try:
+            response = requests.post(url,json={"name":name,"period":period})
+            print(response.content)
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            print("An error occurred performing request")
+            raise SystemExit(e)
+    except KeyError:
+        print("API_HOST not set")
+
+@app.command()
+def optimize(sequence,period,whole):
+    try:
+        url = "http://" + str(os.environ['OWO_API_HOST']) + "/api/v1/sequence/optimize"
+        try:
+            response = requests.post(url,json={"name":sequence,"period":period,"whole":whole})
+            print(response.content)
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            print("An error occurred performing request")
+            raise SystemExit(e)
+    except KeyError:
+        print("API_HOST not set")
+
+@app.command()
+def setHost(host):
+    
+    os.environ['OWO_API_HOST'] = host
+    return None
+
+@app.command()
+def simulate(sequence,period):
+    try:
+        url = "http://" + str(os.environ['OWO_API_HOST']) + "api/v1/sequence/sim/opt"
+        try:
+            response = requests.post(url,json={"name":sequence,"period":period})
+            print(response.content)
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            print("An error occurred performing request")
+            raise SystemExit(e)
+    except KeyError:
+        print("API_HOST not set")
+
+    return 1
+
+if __name__ == "__main__":
+    app()
+
+
+
